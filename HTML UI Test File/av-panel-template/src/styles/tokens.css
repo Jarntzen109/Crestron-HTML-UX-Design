@@ -1,0 +1,85 @@
+/* ─────────────────────────────────────────────────────────────
+   AV PANEL DESIGN TOKENS
+   Edit here to retheme the entire UI
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Backgrounds */
+  --av-bg-page:       #0a0a0a;
+  --av-bg-surface:    #181818;
+  --av-bg-elevated:   #222222;
+  --av-bg-input:      #2a2a2a;
+
+  /* Borders */
+  --av-border-subtle:  #2a2a2a;
+  --av-border-default: #383838;
+  --av-border-strong:  #505050;
+
+  /* Text */
+  --av-text-primary:   #f0f0f0;
+  --av-text-secondary: #999999;
+  --av-text-muted:     #555555;
+
+  /* Brand / Accent */
+  --av-accent:         #4a9eff;
+  --av-accent-dim:     #1a3a5e;
+
+  /* Semantic */
+  --av-green:          #22c55e;
+  --av-green-dim:      #0f2e1c;
+  --av-red:            #ef4444;
+  --av-red-dim:        #2e0f0f;
+  --av-amber:          #f59e0b;
+  --av-amber-dim:      #2e1f0a;
+
+  /* Active state (button pressed/selected) */
+  --av-active-bg:      #1a3a5e;
+  --av-active-border:  #4a9eff;
+  --av-active-text:    #7ec4ff;
+
+  /* Typography */
+  --av-font:           'Inter', 'Segoe UI', system-ui, sans-serif;
+  --av-font-mono:      'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Spacing scale */
+  --av-gap-xs:  4px;
+  --av-gap-sm:  8px;
+  --av-gap-md:  12px;
+  --av-gap-lg:  16px;
+  --av-gap-xl:  24px;
+
+  /* Component sizing */
+  --av-btn-height-sm:  36px;
+  --av-btn-height-md:  52px;
+  --av-btn-height-lg:  72px;
+  --av-radius-sm:      4px;
+  --av-radius-md:      6px;
+  --av-radius-lg:      10px;
+
+  /* Join badge (visible in dev, hidden in production) */
+  --av-join-opacity: 0.4;
+}
+
+/* ─── Base reset ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--av-bg-page);
+  font-family: var(--av-font);
+  color: var(--av-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Utility classes ─── */
+.av-flex       { display: flex; }
+.av-flex-col   { display: flex; flex-direction: column; }
+.av-gap-sm     { gap: var(--av-gap-sm); }
+.av-gap-md     { gap: var(--av-gap-md); }
+.av-gap-lg     { gap: var(--av-gap-lg); }
+.av-grow       { flex: 1; }
+
+/* Hides join number labels — set to 0 before deploying to processor */
+.join-label { opacity: var(--av-join-opacity); }

@@ -1,0 +1,25 @@
+{
+  "name": "av-panel-template",
+  "version": "1.0.0",
+  "description": "Crestron CH5 touch panel visual component library — React + Vite + TypeScript",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0"
+  },
+  "notes": {
+    "ch5": "Add @crestron/ch5-crcomlib and @crestron/ch5-webxpanel when ready to wire CH5 joins"
+  }
+}
