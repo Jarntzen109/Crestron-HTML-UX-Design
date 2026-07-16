@@ -16,13 +16,16 @@ import './styles/tokens.css';
 // ── Import your pages ────────────────────────────────────────
 import { ComponentLibrary }   from './pages/ComponentLibrary';
 import { CameraControlPage }  from './pages/CameraControl';
+import { TrainingRoomPage }   from './pages/TrainingRoom';
 
 // ── CHANGE THIS LINE to switch what renders ──────────────────
 //
 //  Browse components:  <ComponentLibrary />
-//  Specific page:      <CameraControlPage />
+//  Specific page:       <CameraControlPage />
+//                        <TrainingRoomPage />
 //
-const ACTIVE_PAGE = <ComponentLibrary />;
+const ACTIVE_PAGE = <TrainingRoomPage />;
+// const ACTIVE_PAGE = <ComponentLibrary />;
 // const ACTIVE_PAGE = <CameraControlPage />;
 
 // ─────────────────────────────────────────────────────────────

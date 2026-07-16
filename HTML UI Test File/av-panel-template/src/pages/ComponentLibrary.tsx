@@ -16,6 +16,8 @@ import { GroupBox } from '../components/GroupBox';
 import { AVButton, AVButtonGroup } from '../components/AVButton';
 import { AVSlider, AVGauge } from '../components/AVSlider';
 import { PTZControl } from '../components/PTZControl';
+import { LayoutCanvas } from '../components/LayoutCanvas';
+import { Positioned } from '../components/Positioned';
 
 // ── Section wrapper for the library ──────────────────────────
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -36,7 +38,7 @@ export const ComponentLibrary: React.FC = () => {
   const [gaugeVal, setGaugeVal] = useState(65);
 
   return (
-    <PanelLayout showDevFrame>
+    <PanelLayout showDevFrame expectOrientation="landscape">
       {/* Scrollable library canvas */}
       <div style={{ overflow: 'auto', flex: 1, paddingRight: 4 }}>
 
@@ -153,6 +155,25 @@ export const ComponentLibrary: React.FC = () => {
           <div style={{ marginTop: 8, fontSize: 10, color: 'var(--av-text-muted)' }}>
             ↑ VOL gauge follows the Room Volume slider above
           </div>
+        </Section>
+
+        {/* ── LAYOUT CANVAS ───────────────────────────────── */}
+        <Section title="LayoutCanvas + Positioned — drag-to-place layout (Construct-style)">
+          <div style={{ fontSize: 11, color: 'var(--av-text-muted)', marginBottom: 8 }}>
+            Click "Edit Layout", drag the buttons around, then "Copy Positions" —
+            paste the result into a <code>POSITIONS</code> object in your page file.
+          </div>
+          <LayoutCanvas width="100%" height={220}>
+            <Positioned id="demoA" x={20} y={20} w={140} h={52}>
+              <AVButton label="Drag Me" joinNumber={1} />
+            </Positioned>
+            <Positioned id="demoB" x={180} y={20} w={140} h={52}>
+              <AVButton label="Me Too" joinNumber={2} color="accent" />
+            </Positioned>
+            <Positioned id="demoC" x={20} y={100} w={140} h={52}>
+              <AVButton label="And Me" joinNumber={3} color="success" />
+            </Positioned>
+          </LayoutCanvas>
         </Section>
 
         {/* ── COMPOSITION EXAMPLE ─────────────────────────── */}

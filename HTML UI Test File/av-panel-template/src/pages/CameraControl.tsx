@@ -20,7 +20,7 @@ import { PTZControl } from '../components/PTZControl';
 
 export const CameraControlPage: React.FC = () => {
   return (
-    <PanelLayout showDevFrame>
+    <PanelLayout showDevFrame expectOrientation="landscape">
 
       {/* ── Page header ──────────────────────────────────── */}
       <PageHeader

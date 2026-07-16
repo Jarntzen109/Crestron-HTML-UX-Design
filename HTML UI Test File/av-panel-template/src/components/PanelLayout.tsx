@@ -19,22 +19,33 @@
 //
 //  Dev frame (shows the panel outline during development):
 //    <PanelLayout showDevFrame>
+//
+//  Orientation guard — portrait panels (TSW-570P) need a page built
+//  for a tall/narrow canvas, not a resized landscape page. Declare
+//  what this page was built for and get a warning if ACTIVE_DEVICE
+//  doesn't match:
+//    <PanelLayout expectOrientation="landscape">
 // ─────────────────────────────────────────────────────────────
 
 import React from 'react';
 import { device } from '../config/devices';
+import type { Orientation } from '../config/devices';
 
 interface PanelLayoutProps {
   children:     React.ReactNode;
   showDevFrame?: boolean;
   padding?:     number;
+  expectOrientation?: Orientation;
 }
 
 export const PanelLayout: React.FC<PanelLayoutProps> = ({
   children,
   showDevFrame = false,
   padding = 16,
+  expectOrientation,
 }) => {
+  const orientationMismatch = expectOrientation !== undefined && expectOrientation !== device.orientation;
+
   return (
     /* Outer shell: centers the panel in the browser window during dev */
     <div style={{
@@ -72,6 +83,30 @@ export const PanelLayout: React.FC<PanelLayoutProps> = ({
             zIndex: 9999,
           }}>
             {device.label} · {device.width}×{device.height}
+          </div>
+        )}
+
+        {/* Orientation mismatch warning — this page was built for a
+            different shape canvas than ACTIVE_DEVICE currently targets */}
+        {orientationMismatch && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'rgba(20,4,4,0.92)',
+            zIndex: 10000,
+            padding: 24, textAlign: 'center',
+          }}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--av-red)', letterSpacing: '0.08em', marginBottom: 8 }}>
+                ORIENTATION MISMATCH
+              </div>
+              <div style={{ fontSize: 11, color: 'var(--av-text-secondary)', maxWidth: 340 }}>
+                This page was built for <b>{expectOrientation}</b>, but{' '}
+                <b>{device.label}</b> ({device.width}×{device.height}) is{' '}
+                <b>{device.orientation}</b>. Build a dedicated page for this
+                device instead of reusing a page from the other orientation.
+              </div>
+            </div>
           </div>
         )}
 
