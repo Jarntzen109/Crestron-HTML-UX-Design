@@ -209,7 +209,7 @@ export const ComponentLibrary: React.FC = () => {
                 </AVButtonGroup>
               </GroupBox>
               <GroupBox title="Power" direction="row" width={140}>
-                <AVButton label="Off" joinNumber={50} color="danger" variant="toggle" />
+                <AVButton label="Off" joinNumber={50} color="danger" variant="momentary" />
                 <AVButton label="On"  joinNumber={51} color="success" variant="toggle" />
               </GroupBox>
             </div>

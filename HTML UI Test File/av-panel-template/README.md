@@ -31,8 +31,10 @@ Open the dev server. The Component Library page shows everything available:
 buttons, grouped buttons, PTZ joystick, sliders, gauges, layout containers.
 
 ### Step 2 — Create your page file
-Duplicate `src/pages/CameraControl.tsx` and rename it (e.g. `AudioControl.tsx`).
-Delete the contents and start fresh, or modify the existing layout.
+Duplicate `src/pages/TrainingRoom.tsx` and rename it (e.g. `AudioControl.tsx`).
+Delete the `Positioned` blocks you don't need, then build up your own —
+the comment block at the top of that file walks through the actual
+step-by-step loop used to build it, control by control.
 
 ### Step 3 — Copy-paste components
 Copy a component block from `ComponentLibrary.tsx` into your page.
@@ -97,20 +99,19 @@ wrap in your own hook, whatever your standard is:
 ```
 
 ### Step 6 — Switch App.tsx to your page
-In `src/App.tsx`, change `ACTIVE_PAGE` to your new page component.
+In `src/App.tsx`, add an import for your new page file and change
+`ACTIVE_PAGE` to your new page component.
 
-**Two worked examples, two different build styles:**
-- `CameraControl.tsx` — hand-written flex/grid layout (columns, gaps).
-  Fastest to write, reflows reasonably across panel sizes on its own.
-- `TrainingRoom.tsx` — built with `LayoutCanvas` + `Positioned`
-  (drag-to-place). Slower to set up per control, but layout is exact
-  and adjustable by dragging instead of editing CSS. The comment block
-  at the top of the file walks through the actual step-by-step loop
-  used to build it, control by control.
+`TrainingRoom.tsx` is the one worked example this template ships with,
+built with `LayoutCanvas` + `Positioned` (drag-to-place) — that's the
+recommended default for new rooms since it's the easiest to hand to
+someone who's never used this template before: drag things where they
+belong, copy the coordinates, paste them in.
 
-Neither is "correct" — flex/grid for pages that are mostly rows and
-columns anyway, `LayoutCanvas` for pages where controls need exact,
-non-grid placement (e.g. overlaying controls on a room floorplan).
+Plain flex/grid (hand-written `style={{ display: 'flex', ... }}`
+containers, no `LayoutCanvas`) still works fine for a page that's
+mostly simple rows and columns — it's just not what the shipped
+example demonstrates.
 
 ### Step 7 — Retarget device if needed
 In `src/config/devices.ts`, change `ACTIVE_DEVICE`:
@@ -134,12 +135,11 @@ Flipping `ACTIVE_DEVICE` always resizes the canvas. What else your page
 needs depends on *how* you built it and *how different* the new target is:
 
 ### Same orientation, different size (e.g. TS-770 → TS-1070)
-Pages built with normal flex/grid (like `CameraControl.tsx`) mostly
-reflow on their own — columns using `flex: 1` absorb the extra width,
-`GroupBox` widths stay fixed. Still eyeball it: a 640px gain in width
-going from TS-770 to TS-1070 usually shows up as dead space on the
-right rather than broken layout, but check spacing/proportions before
-calling it done.
+Pages built with normal flex/grid mostly reflow on their own — columns
+using `flex: 1` absorb the extra width, `GroupBox` widths stay fixed.
+Still eyeball it: a 640px gain in width going from TS-770 to TS-1070
+usually shows up as dead space on the right rather than broken layout,
+but check spacing/proportions before calling it done.
 
 If the page uses `LayoutCanvas` + `Positioned` (drag-placed), the
 coordinates are pixel-absolute and **do not scale**. A button dragged
@@ -173,7 +173,7 @@ and `PanelLayout` will show a full-screen warning if it doesn't match
 <PanelLayout expectOrientation="landscape">
 ```
 
-`CameraControl.tsx` and `ComponentLibrary.tsx` both do this already —
+`TrainingRoom.tsx` and `ComponentLibrary.tsx` both do this already —
 try setting `ACTIVE_DEVICE` to `'ts570p'` and reloading to see it fire.
 
 **One line change. Everything snaps to the new canvas size.**
@@ -206,8 +206,7 @@ src/
 │   └── PanelLayout.tsx     ← Root canvas + PageHeader
 ├── pages/
 │   ├── ComponentLibrary.tsx ← THE PARTS BIN — browse this during development
-│   ├── CameraControl.tsx   ← Example page: hand-written flex/grid layout
-│   └── TrainingRoom.tsx    ← Example page: drag-to-place LayoutCanvas layout
+│   └── TrainingRoom.tsx    ← THE TEMPLATE ROOM — duplicate this to start any new room
 └── App.tsx                 ← Change ACTIVE_PAGE to switch what renders
 ```
 

@@ -1,7 +1,16 @@
 // ─────────────────────────────────────────────────────────────
-//  TrainingRoom.tsx  — worked example: building a page with the
-//  drag-to-position workflow (LayoutCanvas + Positioned), instead
-//  of CameraControl.tsx's hand-written flex/grid layout.
+//  ExampleRoom.tsx  — THE TEMPLATE ROOM. Duplicate this file to
+//  start any new room, regardless of what that room actually is —
+//  the name is just this example's, the pattern is generic.
+//
+//  Built with the drag-to-position workflow (LayoutCanvas +
+//  Positioned) rather than hand-written flex/grid, because it's
+//  the easiest one to hand to a programmer who's never used this
+//  template before: drag things where they belong, copy the
+//  resulting coordinates, paste them in. Plain flex/grid still
+//  works fine too (just wrap children in normal divs with
+//  style={{ display: 'flex', ... }} instead of LayoutCanvas/
+//  Positioned) if a page is mostly simple rows and columns.
 //
 //  HOW THIS PAGE WAS ACTUALLY BUILT — the real per-control loop:
 //
@@ -40,16 +49,16 @@ import { Positioned } from '../components/Positioned';
 // README's "Switching Between Device Profiles" section for what
 // changes if you retarget this page to a smaller panel.
 const POSITIONS = {
-  sources: { x: 0, y: 0, w: 280, h: 380 },
-  camera: { x: 304, y: 0, w: 580, h: 380 },
-  audio: { x: 908, y: 0, w: 380, h: 380 },
-  lighting: { x: 1296, y: 0, w: 280, h: 380 },
-  display: { x: 0, y: 404, w: 280, h: 200 },
-  screen: { x: 304, y: 404, w: 280, h: 200 },
+  sources: { x: 24, y: 24, w: 280, h: 380 },
+  camera: { x: 600, y: 336, w: 580, h: 380 },
+  audio: { x: 1368, y: 568, w: 380, h: 380 },
+  lighting: { x: 1368, y: 120, w: 280, h: 380 },
+  display: { x: 24, y: 456, w: 280, h: 200 },
+  screen: { x: 24, y: 704, w: 280, h: 200 },
   help: { x: 608, y: 404, w: 584, h: 200 },
 };
 
-export const TrainingRoomPage: React.FC = () => {
+export const ExampleRoomPage: React.FC = () => {
   return (
     <PanelLayout showDevFrame expectOrientation="landscape">
 
@@ -69,7 +78,7 @@ export const TrainingRoomPage: React.FC = () => {
               <AVButton label="Doc Cam"  joinNumber={12} size="lg" />
               <AVButton label="Blu-ray"  joinNumber={13} size="lg" />
               <AVButton label="Teams"    joinNumber={14} size="lg" />
-              <AVButton label="Brandons Cool" joinNumber={15} size='sm' />
+              <AVButton label="Table HDMI"    joinNumber={27} size="md" />
             </AVButtonGroup>
           </GroupBox>
         </Positioned>
@@ -118,17 +127,6 @@ export const TrainingRoomPage: React.FC = () => {
             <AVButton label="▲ Up"   joinNumber={52} variant="momentary" size="lg" />
             <AVButton label="▼ Down" joinNumber={53} variant="momentary" size="lg" />
           </GroupBox>
-        </Positioned>
-
-        <Positioned id="help" {...POSITIONS.help}>
-          <AVButton
-            label="Call AV Support"
-            joinNumber={90}
-            variant="momentary"
-            color="danger"
-            size="lg"
-            style={{ height: '100%' }}
-          />
         </Positioned>
 
       </LayoutCanvas>
