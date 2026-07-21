@@ -94,34 +94,36 @@ export const LayoutCanvas: React.FC<LayoutCanvasProps> = ({
           {children}
         </div>
 
-        {/* Edit mode controls — dev-only, strip before deploy */}
-        <div style={{ position: 'absolute', top: 4, right: 4, display: 'flex', gap: 6, zIndex: 9999 }}>
-          <button
-            onClick={() => setEditMode(v => !v)}
-            style={{
-              fontSize: 10, padding: '4px 8px', borderRadius: 4,
-              border: `1px solid ${editMode ? 'var(--av-accent)' : 'var(--av-border-default)'}`,
-              background: editMode ? 'var(--av-active-bg)' : 'var(--av-bg-elevated)',
-              color: editMode ? 'var(--av-active-text)' : 'var(--av-text-secondary)',
-              cursor: 'pointer', fontFamily: 'var(--av-font-mono)',
-            }}
-          >
-            {editMode ? '✓ Edit Layout' : 'Edit Layout'}
-          </button>
-          {editMode && (
+        {/* Edit mode controls — dev-only, automatically stripped from production builds */}
+        {import.meta.env.DEV && (
+          <div style={{ position: 'absolute', top: 4, right: 4, display: 'flex', gap: 6, zIndex: 9999 }}>
             <button
-              onClick={copyPositions}
+              onClick={() => setEditMode(v => !v)}
               style={{
                 fontSize: 10, padding: '4px 8px', borderRadius: 4,
-                border: '1px solid var(--av-border-default)',
-                background: 'var(--av-bg-elevated)', color: 'var(--av-text-secondary)',
+                border: `1px solid ${editMode ? 'var(--av-accent)' : 'var(--av-border-default)'}`,
+                background: editMode ? 'var(--av-active-bg)' : 'var(--av-bg-elevated)',
+                color: editMode ? 'var(--av-active-text)' : 'var(--av-text-secondary)',
                 cursor: 'pointer', fontFamily: 'var(--av-font-mono)',
               }}
             >
-              {copied ? 'Copied!' : 'Copy Positions'}
+              {editMode ? '✓ Edit Layout' : 'Edit Layout'}
             </button>
-          )}
-        </div>
+            {editMode && (
+              <button
+                onClick={copyPositions}
+                style={{
+                  fontSize: 10, padding: '4px 8px', borderRadius: 4,
+                  border: '1px solid var(--av-border-default)',
+                  background: 'var(--av-bg-elevated)', color: 'var(--av-text-secondary)',
+                  cursor: 'pointer', fontFamily: 'var(--av-font-mono)',
+                }}
+              >
+                {copied ? 'Copied!' : 'Copy Positions'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </LayoutEditContext.Provider>
   );

@@ -19,19 +19,24 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:5173` — you'll see the **Component Library** page
-showing every available component you can copy-paste.
+Open `http://localhost:5173` — you'll see whatever page is currently
+set as `ACTIVE_PAGE` in `src/App.tsx`. To browse every available
+component (the parts bin), open `src/App.tsx` and set `ACTIVE_PAGE`
+to `<ComponentLibrary />`. When you're building or previewing a
+specific room instead, point `ACTIVE_PAGE` at that page's component —
+whatever's set there is what loads when you open the dev server.
 
 ---
 
 ## The Build Workflow (for programmers)
 
 ### Step 1 — Browse components
-Open the dev server. The Component Library page shows everything available:
-buttons, grouped buttons, PTZ joystick, sliders, gauges, layout containers.
+In `src/App.tsx`, set `ACTIVE_PAGE` to `<ComponentLibrary />` and open
+the dev server. That page shows everything available: buttons, grouped
+buttons, PTZ joystick, sliders, gauges, layout containers.
 
 ### Step 2 — Create your page file
-Duplicate `src/pages/TrainingRoom.tsx` and rename it (e.g. `AudioControl.tsx`).
+Duplicate `src/pages/ExampleRoom.tsx` and rename it (e.g. `AudioControl.tsx`).
 Delete the `Positioned` blocks you don't need, then build up your own —
 the comment block at the top of that file walks through the actual
 step-by-step loop used to build it, control by control.
@@ -86,7 +91,14 @@ in the component's `onPress`/`onChange` callbacks.
 ### Step 5 — Wire CH5 in the callbacks (optional, your method)
 Each component exposes `onPress`, `onRelease`, `onChange` props.
 Wire them however your team handles CH5 — use CrComLib directly,
-wrap in your own hook, whatever your standard is:
+wrap in your own hook, whatever your standard is.
+
+This template calls `CrComLib` directly in these callbacks rather than
+using Crestron's native CH5 web components (`<ch5-button>` and similar,
+which route joins on their own). That's deliberate: those components
+would conflict with the `LayoutCanvas` drag-and-drop editor (Step 3b),
+which depends on plain React components and normal pointer events.
+Don't swap in CH5's native elements — it'll break drag-to-place.
 
 ```tsx
 <AVButton
@@ -102,7 +114,7 @@ wrap in your own hook, whatever your standard is:
 In `src/App.tsx`, add an import for your new page file and change
 `ACTIVE_PAGE` to your new page component.
 
-`TrainingRoom.tsx` is the one worked example this template ships with,
+`ExampleRoom.tsx` is the one worked example this template ships with,
 built with `LayoutCanvas` + `Positioned` (drag-to-place) — that's the
 recommended default for new rooms since it's the easiest to hand to
 someone who's never used this template before: drag things where they
@@ -126,6 +138,24 @@ Resolutions are verified against Crestron's published specs. Note TS-1070
 and TS-1080 are the same 1920×1200 panel size but were previously
 mis-set to 1280×800 in an earlier revision of this template — if you
 built anything against those old dimensions, re-check the layout.
+
+### Step 8 — Package and deploy
+```bash
+npm run package
+```
+This builds the app and packages it into `dist/av-panel-template.ch5z`
+— a single file ready to load onto a touch panel. Each panel/room is
+its own build: package once per `ACTIVE_PAGE` you set in Step 6.
+
+Load the `.ch5z` onto the panel with either:
+- **Toolbox** → Web Pages and Mobility Projects, drag in the `.ch5z`, or
+- The panel's own **Project Upload** page (its local web config UI —
+  browse to the panel's IP, find Applications → Project Upload)
+
+Both are self-contained: once uploaded, the panel runs the project
+from its own storage, no server or network dependency needed to keep
+it running. (`ch5-cli deploy` is also available for scripted deploys —
+see the CH5 CLI docs — but isn't necessary for a one-off upload.)
 
 ---
 
@@ -173,17 +203,10 @@ and `PanelLayout` will show a full-screen warning if it doesn't match
 <PanelLayout expectOrientation="landscape">
 ```
 
-`TrainingRoom.tsx` and `ComponentLibrary.tsx` both do this already —
+`ExampleRoom.tsx` and `ComponentLibrary.tsx` both do this already —
 try setting `ACTIVE_DEVICE` to `'ts570p'` and reloading to see it fire.
 
 **One line change. Everything snaps to the new canvas size.**
-
-### Step 8 — Build and deploy
-```bash
-npm run build
-```
-Copy `dist/` to `\USER\HTML\` on the processor via Toolbox File Manager
-or `ch5-cli deploy`.
 
 ---
 
@@ -206,7 +229,7 @@ src/
 │   └── PanelLayout.tsx     ← Root canvas + PageHeader
 ├── pages/
 │   ├── ComponentLibrary.tsx ← THE PARTS BIN — browse this during development
-│   └── TrainingRoom.tsx    ← THE TEMPLATE ROOM — duplicate this to start any new room
+│   └── ExampleRoom.tsx     ← THE TEMPLATE ROOM — duplicate this to start any new room
 └── App.tsx                 ← Change ACTIVE_PAGE to switch what renders
 ```
 

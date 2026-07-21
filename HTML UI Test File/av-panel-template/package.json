@@ -6,14 +6,17 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "package": "npm run build && ch5-cli archive -p av-panel-template -d dist -o dist"
   },
   "dependencies": {
     "@crestron/ch5-crcomlib": "^2.18.0",
+    "@crestron/ch5-webxpanel": "^2.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@crestron/ch5-utilities-cli": "^2.0.0",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@vitejs/plugin-react": "^4.0.0",
@@ -21,6 +24,6 @@
     "vite": "^5.0.0"
   },
   "notes": {
-    "ch5": "Add @crestron/ch5-crcomlib and @crestron/ch5-webxpanel when ready to wire CH5 joins"
+    "ch5": "@crestron/ch5-crcomlib is called directly in component callbacks (see README Step 5) — CH5's native web components (<ch5-button> etc.) are intentionally not used, since they would conflict with the LayoutCanvas drag-and-drop editor. ch5-webxpanel is only needed if testing via a browser-hosted Web XPanel against a control processor; the standard deploy path is `npm run package` → upload the .ch5z to the touch panel directly."
   }
 }

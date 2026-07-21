@@ -15,7 +15,7 @@ import './styles/tokens.css';
 
 // ── Import your pages ────────────────────────────────────────
 import { ComponentLibrary } from './pages/ComponentLibrary';
-import { ExampleRoomPage } from './pages/Example Room';
+import { ExampleRoomPage } from './pages/ExampleRoom';
 // Each new room gets its own import here, e.g.:
 // import { CEOOfficePage } from './pages/CEOOffice'; ← doesn't exist yet, just an example
 

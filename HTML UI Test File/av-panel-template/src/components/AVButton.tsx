@@ -151,32 +151,60 @@ export const AVButton: React.FC<AVButtonProps> = ({
 //  AVButtonGroup
 //  Wraps AVButton children so only one can be active at a time.
 //
-//  COPY-PASTE USAGE:
+//  COPY-PASTE USAGE (uncontrolled — group tracks its own selection):
 //    <AVButtonGroup columns={2}>
 //      <AVButton label="HDMI 1" joinNumber={10} variant="select" />
 //      <AVButton label="HDMI 2" joinNumber={11} variant="select" />
 //      <AVButton label="Teams"  joinNumber={12} variant="select" />
 //    </AVButtonGroup>
+//
+//  CONTROLLED BY CH5 FEEDBACK — pass activeIndex so the highlighted
+//  button reflects your program's actual select join, not just the
+//  last thing pressed on screen. Use onSelect to publish the join:
+//    <AVButtonGroup
+//      activeIndex={sourceFeedbackIndex}
+//      onSelect={(i) => CrComLib.publishEvent('boolean', String(10 + i), true)}
+//    >
+//      <AVButton label="HDMI 1" joinNumber={10} variant="select" />
+//      <AVButton label="HDMI 2" joinNumber={11} variant="select" />
+//      <AVButton label="Teams"  joinNumber={12} variant="select" />
+//    </AVButtonGroup>
+//
+//  Each button's own onPress (if set) still fires before onSelect.
+//  Default initial selection is index 0 — pass defaultActiveIndex={null}
+//  for no selection until feedback arrives.
 // ─────────────────────────────────────────────────────────────
 
 interface AVButtonGroupProps {
   columns?: number;
   children: React.ReactNode;
   style?: React.CSSProperties;
+  activeIndex?: number | null;        // controlled — drive from CH5 feedback join
+  defaultActiveIndex?: number | null; // uncontrolled initial selection (default: 0)
+  onSelect?: (index: number) => void; // fired when a button in the group is pressed
 }
 
 export const AVButtonGroup: React.FC<AVButtonGroupProps> = ({
   columns = 1,
   children,
   style,
+  activeIndex: controlledActiveIndex,
+  defaultActiveIndex = 0,
+  onSelect,
 }) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(0);
+  const [internalActiveIndex, setInternalActiveIndex] = useState<number | null>(defaultActiveIndex);
+  const activeIndex = controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;
 
   const wrappedChildren = React.Children.map(children, (child, index) => {
     if (!React.isValidElement(child)) return child;
+    const childProps = child.props as AVButtonProps;
     return React.cloneElement(child as React.ReactElement<AVButtonProps>, {
       active: activeIndex === index,
-      onPress: () => setActiveIndex(index),
+      onPress: () => {
+        childProps.onPress?.();
+        if (controlledActiveIndex === undefined) setInternalActiveIndex(index);
+        onSelect?.(index);
+      },
       variant: 'select',
     });
   });
