@@ -26,6 +26,16 @@ to `<ComponentLibrary />`. When you're building or previewing a
 specific room instead, point `ACTIVE_PAGE` at that page's component —
 whatever's set there is what loads when you open the dev server.
 
+**Pulled new changes, or opening this on a different machine? Run
+`npm install` again.** `node_modules` doesn't update itself — it only
+reflects whatever `package.json` said the *last* time you ran
+`npm install`. If a teammate adds a dependency and you pull their
+changes, your local copy is out of sync until you reinstall. Symptoms
+of this: `npm run dev` or `npm run package` suddenly failing with a
+missing-module error, or a command "not found" that used to work.
+When in doubt, run `npm install` — it's harmless to run again even if
+nothing changed.
+
 ---
 
 ## The Build Workflow (for programmers)
