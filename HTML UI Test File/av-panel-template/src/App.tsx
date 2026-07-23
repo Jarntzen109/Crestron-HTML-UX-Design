@@ -11,12 +11,12 @@
 //  here and map routes to page components.
 // ─────────────────────────────────────────────────────────────
 
-import './styles/tokens.css';
+import "./styles/tokens.css";
 
 // ── Import your pages ────────────────────────────────────────
-import { ComponentLibrary } from './pages/ComponentLibrary';
-import { ExampleRoomPage } from './pages/ExampleRoom';
-import { TrainingRoom } from './pages/TrainingRoom';
+import { ComponentLibrary } from "./pages/ComponentLibrary";
+import { ExampleRoomPage } from "./pages/ExampleRoom";
+import { TrainingRoom } from "./pages/TrainingRoom";
 // Each new room gets its own import here, e.g.:
 // import { CEOOfficePage } from './pages/CEOOffice'; ← doesn't exist yet, just an example
 
@@ -31,7 +31,7 @@ import { TrainingRoom } from './pages/TrainingRoom';
 //
 // const ACTIVE_PAGE = <ComponentLibrary />;
 // const ACTIVE_PAGE = <ExampleRoomPage />;
-const ACTIVE_PAGE = <TrainingRoom />;
+ const ACTIVE_PAGE = <TrainingRoom />;
 // ─────────────────────────────────────────────────────────────
 
 export default function App() {

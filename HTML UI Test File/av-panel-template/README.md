@@ -40,18 +40,39 @@ nothing changed.
 
 ## The Build Workflow (for programmers)
 
-### Step 1 — Browse components
+### Step 1 — Install prerequisites
+Before anything else, you need two things on your machine:
+
+1. **Node.js** — version 18 or later (the current LTS release from
+   [nodejs.org](https://nodejs.org) is the safe default). This is what
+   gives you `npm`, which every command in this guide runs through.
+2. **A code editor** — VS Code is the common choice, but anything that
+   can open a folder and a terminal works.
+
+Open this project's folder in your editor, open a terminal inside it,
+and run:
+```bash
+npm install
+```
+This reads `package.json` and downloads everything the project
+depends on — React, Vite, TypeScript, the CH5 libraries — into a
+`node_modules` folder. **Nothing else in this guide works until this
+finishes** — it can take a minute or two the first time. (Pulled new
+changes later and things stop working? Run it again — see the note
+under Quick Start above.)
+
+### Step 2 — Browse components
 In `src/App.tsx`, set `ACTIVE_PAGE` to `<ComponentLibrary />` and open
 the dev server. That page shows everything available: buttons, grouped
 buttons, PTZ joystick, sliders, gauges, layout containers.
 
-### Step 2 — Create your page file
+### Step 3 — Create your page file
 Duplicate `src/pages/ExampleRoom.tsx` and rename it (e.g. `AudioControl.tsx`).
 Delete the `Positioned` blocks you don't need, then build up your own —
 the comment block at the top of that file walks through the actual
 step-by-step loop used to build it, control by control.
 
-### Step 3 — Copy-paste components
+### Step 4 — Copy-paste components
 Copy a component block from `ComponentLibrary.tsx` into your page.
 For example, a camera select group:
 
@@ -64,7 +85,7 @@ For example, a camera select group:
 </GroupBox>
 ```
 
-### Step 3b — Or drag-position instead of hand-editing CSS
+### Step 4b — Or drag-position instead of hand-editing CSS
 Most components (`GroupBox`, flex rows, etc.) lay out with normal CSS
 flex/grid. If you'd rather freely place things by dragging — closer to
 how Construct's canvas works — wrap them in `LayoutCanvas` +
@@ -92,13 +113,13 @@ copies an updated `POSITIONS` object to your clipboard. Paste it back
 over the one in your page file to persist the new layout. Try it live
 in the Component Library page under "LayoutCanvas + Positioned."
 
-### Step 4 — Set your join numbers
+### Step 5 — Set your join numbers
 Replace `joinNumber={1}` etc. with whatever digital/analog joins
 your SIMPL program uses. The `joinNumber` prop is just a visual label in dev —
 the actual CH5 wiring happens in the component's `onPress`/`onRelease`/
-`onChange` callbacks, covered next in Step 5.
+`onChange` callbacks, covered next in Step 6.
 
-### Step 5 — Wire CH5 in the callbacks
+### Step 6 — Wire CH5 in the callbacks
 Each component exposes `onPress`, `onRelease`, `onChange` props.
 CrComLib is already set up for you (see "CrComLib Setup" below) and
 available anywhere as `window.CrComLib` — no import needed.
@@ -107,7 +128,7 @@ This template calls `window.CrComLib` directly in these callbacks
 rather than using Crestron's native CH5 web components (`<ch5-button>`
 and similar, which route joins on their own). That's deliberate: those
 components would conflict with the `LayoutCanvas` drag-and-drop editor
-(Step 3b), which depends on plain React components and normal pointer
+(Step 4b), which depends on plain React components and normal pointer
 events. Don't swap in CH5's native elements — it'll break drag-to-place.
 
 There are two patterns depending on what the control needs:
@@ -128,7 +149,15 @@ selects/routes where you don't need the UI to reflect real feedback:
 what the processor is actually doing (power on/off is the classic
 case), don't let the UI decide its own highlighted state. Use
 `variant="momentary"` so pressing only reports intent, and drive the
-`active` prop from a state variable fed by a feedback subscription:
+`active` prop from a state variable fed by a feedback subscription.
+Default that state to `false`, and don't try to distinguish it from
+"nothing sent yet" with `null` — CrComLib fires the subscription
+callback synchronously on subscribe with the join's current value,
+even for a join nothing has ever touched, and for a boolean that
+value is `false`. Unlike a serial join (empty string is a safe
+"nothing yet" signal), a digital join has no third "unset" state on
+the wire — `false` is both the real "confirmed off" value and the
+untouched default, and there's no way to tell them apart:
 ```tsx
 const [displayPowerOn, setDisplayPowerOn] = useState(false);
 
@@ -146,8 +175,31 @@ useEffect(() => {
 />
 ```
 The button only lights up because the processor said so — never
-because it was clicked. See `TrainingRoom.tsx`'s Display/Projector
-power buttons for a complete working example of this pattern.
+because it was clicked. In practice that means the "off" side of a
+pair like this shows lit by default until the processor reports
+otherwise, which is normal and matches how most real Crestron feedback
+behaves. See `TrainingRoom.tsx`'s Display/Projector power buttons for
+a complete working example.
+
+**Serial text with a default** — for anything text-driven (room
+names, status messages), use the `useSerialJoin` hook
+(`src/hooks/useSerialJoin.ts`) instead of subscribing by hand. It
+returns `null` until the processor sends something real, so `??`
+gives you a fallback instead of a blank label on startup:
+```tsx
+import { useSerialJoin } from '../hooks/useSerialJoin';
+
+const roomName = useSerialJoin(1) ?? 'Training Room';
+<PageHeader title={roomName} />
+```
+One gotcha the hook already handles for you: CrComLib fires the
+subscription callback immediately on subscribe, even for a join
+nothing has ever sent to — with `''` (empty string), not `null`. A
+naive subscription would treat that `''` as "real data" and never
+fall back to your default; `useSerialJoin` normalizes `''` to `null`
+so `??` works the way you'd expect. See `TrainingRoom.tsx`'s room
+name (serial join 1) or the `useSerialJoin` section in
+`ComponentLibrary.tsx` for working examples.
 
 ### CrComLib Setup (already done — here for reference)
 `@crestron/ch5-crcomlib` ships UMD-only with no import entry point
@@ -165,7 +217,7 @@ If you ever bump the `@crestron/ch5-crcomlib` version in
 cp node_modules/@crestron/ch5-crcomlib/build_bundles/umd/cr-com-lib.js public/cr-com-lib.js
 ```
 
-### Step 6 — Switch App.tsx to your page
+### Step 7 — Switch App.tsx to your page
 In `src/App.tsx`, add an import for your new page file and change
 `ACTIVE_PAGE` to your new page component.
 
@@ -180,7 +232,7 @@ containers, no `LayoutCanvas`) still works fine for a page that's
 mostly simple rows and columns — it's just not what the shipped
 example demonstrates.
 
-### Step 7 — Retarget device if needed
+### Step 8 — Retarget device if needed
 In `src/config/devices.ts`, change `ACTIVE_DEVICE`:
 - `'ts570'`   → Crestron TSW-570          (1280×720, landscape)
 - `'ts570p'`  → Crestron TSW-570P         (720×1280, **portrait**)
@@ -194,13 +246,13 @@ and TS-1080 are the same 1920×1200 panel size but were previously
 mis-set to 1280×800 in an earlier revision of this template — if you
 built anything against those old dimensions, re-check the layout.
 
-### Step 8 — Package and deploy
+### Step 9 — Package and deploy
 ```bash
 npm run package
 ```
 This builds the app and packages it into `dist/av-panel-template.ch5z`
 — a single file ready to load onto a touch panel. Each panel/room is
-its own build: package once per `ACTIVE_PAGE` you set in Step 6.
+its own build: package once per `ACTIVE_PAGE` you set in Step 7.
 
 Load the `.ch5z` onto the panel with either:
 - **Toolbox** → Web Pages and Mobility Projects, drag in the `.ch5z`, or
@@ -246,7 +298,7 @@ const POSITIONS = POSITIONS_BY_DEVICE[ACTIVE_DEVICE] ?? POSITIONS_BY_DEVICE.ts77
 This isn't a resize — width and height swap, so a 3-column landscape
 layout has nowhere to go. **Build a dedicated page** for portrait
 targets rather than reusing a landscape page; duplicate a page file the
-same way you would for any new page (Step 2 above) and stack content
+same way you would for any new page (Step 3 above) and stack content
 vertically instead of in columns.
 
 To catch someone pointing a landscape page at a portrait device (or
@@ -286,6 +338,8 @@ src/
 │   ├── LayoutCanvas.tsx    ← Drag-to-position canvas (Construct-style free placement)
 │   ├── Positioned.tsx      ← Draggable/absolute-positioned wrapper, used inside LayoutCanvas
 │   └── PanelLayout.tsx     ← Root canvas + PageHeader
+├── hooks/
+│   └── useSerialJoin.ts    ← Serial join text with a fallback default (see Step 6)
 ├── pages/
 │   ├── ComponentLibrary.tsx ← THE PARTS BIN — browse this during development
 │   └── ExampleRoom.tsx     ← THE TEMPLATE ROOM — duplicate this to start any new room

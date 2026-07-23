@@ -18,6 +18,7 @@ import { AVSlider, AVGauge } from '../components/AVSlider';
 import { PTZControl } from '../components/PTZControl';
 import { LayoutCanvas } from '../components/LayoutCanvas';
 import { Positioned } from '../components/Positioned';
+import { useSerialJoin } from '../hooks/useSerialJoin';
 
 // ── Section wrapper for the library ──────────────────────────
 const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
@@ -36,6 +37,12 @@ const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title
 
 export const ComponentLibrary: React.FC = () => {
   const [gaugeVal, setGaugeVal] = useState(65);
+
+  // Nothing is sending to join 90 here, so this stays on the fallback
+  // text — exactly what you'd see on a real panel before the processor
+  // has sent anything yet. Try it live: your SIMPL program only needs to
+  // publish a string to serial join 90 and this updates automatically.
+  const roomLabel = useSerialJoin(90) ?? 'No Signal (default text)';
 
   return (
     <PanelLayout showDevFrame expectOrientation="landscape">
@@ -162,6 +169,26 @@ export const ComponentLibrary: React.FC = () => {
           </div>
           <div style={{ marginTop: 8, fontSize: 10, color: 'var(--av-text-muted)' }}>
             ↑ VOL gauge follows the Room Volume slider above
+          </div>
+        </Section>
+
+        {/* ── SERIAL JOIN ─────────────────────────────────── */}
+        <Section title="useSerialJoin — text driven by a serial join (room names, status text, etc.)">
+          <div style={{ fontSize: 11, color: 'var(--av-text-muted)', marginBottom: 10 }}>
+            Not a visual component — a hook (<code>src/hooks/useSerialJoin.ts</code>).
+            Returns <code>null</code> until the processor actually sends a
+            string on that join, so you can fall back to placeholder text
+            with <code>??</code> instead of showing blank/undefined while
+            the panel is still connecting:
+          </div>
+          <div style={{
+            fontSize: 22, fontWeight: 300, letterSpacing: '0.08em',
+            color: 'var(--av-text-primary)', textTransform: 'uppercase',
+          }}>
+            {roomLabel}
+          </div>
+          <div style={{ fontSize: 10, color: 'var(--av-text-muted)', marginTop: 8, fontFamily: 'var(--av-font-mono)' }}>
+            const roomName = useSerialJoin(90) ?? 'No Signal (default text)';
           </div>
         </Section>
 
