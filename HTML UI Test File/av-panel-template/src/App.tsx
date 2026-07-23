@@ -16,6 +16,7 @@ import './styles/tokens.css';
 // ── Import your pages ────────────────────────────────────────
 import { ComponentLibrary } from './pages/ComponentLibrary';
 import { ExampleRoomPage } from './pages/ExampleRoom';
+import { TrainingRoom } from './pages/TrainingRoom';
 // Each new room gets its own import here, e.g.:
 // import { CEOOfficePage } from './pages/CEOOffice'; ← doesn't exist yet, just an example
 
@@ -28,9 +29,9 @@ import { ExampleRoomPage } from './pages/ExampleRoom';
 // Build with one active here, deploy, then switch and rebuild for
 // the next room. This is not a multi-room router.
 //
-//const ACTIVE_PAGE = <ComponentLibrary />;
- const ACTIVE_PAGE = <ExampleRoomPage />;
-
+// const ACTIVE_PAGE = <ComponentLibrary />;
+// const ACTIVE_PAGE = <ExampleRoomPage />;
+const ACTIVE_PAGE = <TrainingRoom />;
 // ─────────────────────────────────────────────────────────────
 
 export default function App() {

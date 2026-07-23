@@ -141,6 +141,14 @@ export const ComponentLibrary: React.FC = () => {
             <AVSlider label="Mic Level"   joinNumber={2} defaultValue={50} />
             <AVSlider label="BG Music"    joinNumber={3} defaultValue={20} />
           </div>
+          <div style={{ fontSize: 11, color: 'var(--av-text-muted)', margin: '14px 0 8px' }}>
+            Vertical (pass <code>orientation="vertical"</code> — good for audio channel strips):
+          </div>
+          <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
+            <AVSlider label="Ch 1" joinNumber={4} defaultValue={65} orientation="vertical" />
+            <AVSlider label="Ch 2" joinNumber={5} defaultValue={80} orientation="vertical" />
+            <AVSlider label="Ch 3" joinNumber={6} defaultValue={40} orientation="vertical" length={160} />
+          </div>
         </Section>
 
         {/* ── GAUGES ──────────────────────────────────────── */}

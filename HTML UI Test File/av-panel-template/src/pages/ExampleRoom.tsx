@@ -7,7 +7,7 @@
 //  Positioned) rather than hand-written flex/grid, because it's
 //  the easiest one to hand to a programmer who's never used this
 //  template before: drag things where they belong, copy the
-//  resulting coordinates, paste them in. Plain flex/grid still
+//  resulting coordinates, and paste them in. Plain flex/grid still
 //  works fine too (just wrap children in normal divs with
 //  style={{ display: 'flex', ... }} instead of LayoutCanvas/
 //  Positioned) if a page is mostly simple rows and columns.

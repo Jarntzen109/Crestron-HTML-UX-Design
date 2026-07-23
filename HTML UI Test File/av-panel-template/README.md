@@ -95,29 +95,74 @@ in the Component Library page under "LayoutCanvas + Positioned."
 ### Step 4 — Set your join numbers
 Replace `joinNumber={1}` etc. with whatever digital/analog joins
 your SIMPL program uses. The `joinNumber` prop is just a visual label in dev —
-the actual CH5 wiring happens in your own `useCrestron` hook or directly
-in the component's `onPress`/`onChange` callbacks.
+the actual CH5 wiring happens in the component's `onPress`/`onRelease`/
+`onChange` callbacks, covered next in Step 5.
 
-### Step 5 — Wire CH5 in the callbacks (optional, your method)
+### Step 5 — Wire CH5 in the callbacks
 Each component exposes `onPress`, `onRelease`, `onChange` props.
-Wire them however your team handles CH5 — use CrComLib directly,
-wrap in your own hook, whatever your standard is.
+CrComLib is already set up for you (see "CrComLib Setup" below) and
+available anywhere as `window.CrComLib` — no import needed.
 
-This template calls `CrComLib` directly in these callbacks rather than
-using Crestron's native CH5 web components (`<ch5-button>` and similar,
-which route joins on their own). That's deliberate: those components
-would conflict with the `LayoutCanvas` drag-and-drop editor (Step 3b),
-which depends on plain React components and normal pointer events.
-Don't swap in CH5's native elements — it'll break drag-to-place.
+This template calls `window.CrComLib` directly in these callbacks
+rather than using Crestron's native CH5 web components (`<ch5-button>`
+and similar, which route joins on their own). That's deliberate: those
+components would conflict with the `LayoutCanvas` drag-and-drop editor
+(Step 3b), which depends on plain React components and normal pointer
+events. Don't swap in CH5's native elements — it'll break drag-to-place.
 
+There are two patterns depending on what the control needs:
+
+**Simple, fire-and-forget** — just publish on press. Fine for
+selects/routes where you don't need the UI to reflect real feedback:
 ```tsx
 <AVButton
   label="Audience"
   joinNumber={1}
   variant="toggle"
-  onPress={() => CrComLib.publishEvent('boolean', '1', true)}
-  onRelease={() => CrComLib.publishEvent('boolean', '1', false)}
+  onPress={() => window.CrComLib.publishEvent('boolean', '1', true)}
+  onRelease={() => window.CrComLib.publishEvent('boolean', '1', false)}
 />
+```
+
+**Feedback-driven** — for anything where the highlight should reflect
+what the processor is actually doing (power on/off is the classic
+case), don't let the UI decide its own highlighted state. Use
+`variant="momentary"` so pressing only reports intent, and drive the
+`active` prop from a state variable fed by a feedback subscription:
+```tsx
+const [displayPowerOn, setDisplayPowerOn] = useState(false);
+
+useEffect(() => {
+  const id = window.CrComLib.subscribeState('boolean', '34', setDisplayPowerOn);
+  return () => window.CrComLib.unsubscribeState('boolean', '34', id);
+}, []);
+
+<AVButton
+  label="On"
+  variant="momentary"
+  active={displayPowerOn}
+  onPress={() => window.CrComLib.publishEvent('boolean', '34', true)}
+  onRelease={() => window.CrComLib.publishEvent('boolean', '34', false)}
+/>
+```
+The button only lights up because the processor said so — never
+because it was clicked. See `TrainingRoom.tsx`'s Display/Projector
+power buttons for a complete working example of this pattern.
+
+### CrComLib Setup (already done — here for reference)
+`@crestron/ch5-crcomlib` ships UMD-only with no import entry point
+(check its `package.json` — no `main`/`module`/`exports`, only
+`types`), so it can't be `import`ed. It's loaded as a global instead:
+- `public/cr-com-lib.js` — a copy of the library, loaded as a plain
+  `<script>` (anything in `public/` is served as-is by Vite).
+- `index.html` loads that script *before* the app bundle, so
+  `window.CrComLib` exists by the time any component tries to use it.
+- `src/globals.d.ts` types `window.CrComLib` for TypeScript.
+
+If you ever bump the `@crestron/ch5-crcomlib` version in
+`package.json`, re-copy the file so `public/` matches:
+```bash
+cp node_modules/@crestron/ch5-crcomlib/build_bundles/umd/cr-com-lib.js public/cr-com-lib.js
 ```
 
 ### Step 6 — Switch App.tsx to your page
@@ -223,7 +268,11 @@ try setting `ACTIVE_DEVICE` to `'ts570p'` and reloading to see it fire.
 ## Project Structure
 
 ```
+public/
+└── cr-com-lib.js           ← CrComLib, loaded as a global — see "CrComLib Setup" above
+index.html                  ← Loads cr-com-lib.js before the app bundle
 src/
+├── globals.d.ts             ← Types window.CrComLib for TypeScript
 ├── config/
 │   └── devices.ts          ← Change ACTIVE_DEVICE here to retarget
 ├── styles/
@@ -232,8 +281,8 @@ src/
 │   ├── AVButton.tsx        ← Toggle, momentary, select buttons + AVButtonGroup
 │   ├── GroupBox.tsx        ← Labeled border container (like VTPro group box)
 │   ├── PTZControl.tsx      ← Camera joystick with pan/tilt/zoom + presets
-│   ├── AVSlider.tsx        ← Horizontal fader (analog join)
-│   │                          AVGauge — vertical level meter (read-only feedback)
+│   ├── AVSlider.tsx        ← Horizontal or vertical fader (analog join)
+│   │                          AVGauge — level meter (read-only feedback)
 │   ├── LayoutCanvas.tsx    ← Drag-to-position canvas (Construct-style free placement)
 │   ├── Positioned.tsx      ← Draggable/absolute-positioned wrapper, used inside LayoutCanvas
 │   └── PanelLayout.tsx     ← Root canvas + PageHeader

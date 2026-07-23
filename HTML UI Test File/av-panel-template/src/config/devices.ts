@@ -69,6 +69,6 @@ export const DEVICE_PROFILES: Record<DeviceTarget, {
 };
 
 // ← CHANGE THIS ONE LINE TO RETARGET THE WHOLE UI
-export const ACTIVE_DEVICE: DeviceTarget = 'ts1070';
+export const ACTIVE_DEVICE: DeviceTarget = 'ts770';
 
 export const device = DEVICE_PROFILES[ACTIVE_DEVICE];
