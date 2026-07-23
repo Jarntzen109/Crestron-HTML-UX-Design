@@ -94,6 +94,8 @@ export const ExampleRoomPage: React.FC = () => {
                 { label: 'Podium', recallJoin: 30, saveJoin: 40 },
                 { label: 'Wide',   recallJoin: 31, saveJoin: 41 },
               ]}
+              onPress={(join) => window.CrComLib.publishEvent('boolean', String(join), true)}
+              onRelease={(join) => window.CrComLib.publishEvent('boolean', String(join), false)}
             />
           </GroupBox>
         </Positioned>

@@ -105,6 +105,71 @@ const PtzButton: React.FC<{
   );
 };
 
+// Same local-pressed-state pattern as PtzButton above, just shaped for the
+// preset row's rectangular buttons instead of PtzButton's fixed square.
+const PresetSaveButton: React.FC<{
+  join: number;
+  label: string;
+  width: number;
+  height: number;
+  fontSize: number;
+  onPress?: (j: number) => void;
+  onRelease?: (j: number) => void;
+}> = ({ join, label, width, height, fontSize, onPress, onRelease }) => {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <button
+      onPointerDown={() => { setPressed(true); onPress?.(join); }}
+      onPointerUp={() => { setPressed(false); onRelease?.(join); }}
+      onPointerLeave={() => { setPressed(false); onRelease?.(join); }}
+      style={{
+        width, height, fontSize, fontWeight: 600,
+        background: pressed ? 'var(--av-active-bg)' : 'var(--av-bg-elevated)',
+        border: `1px solid ${pressed ? 'var(--av-active-border)' : 'var(--av-border-default)'}`,
+        borderRadius: 'var(--av-radius-sm)',
+        color: pressed ? 'var(--av-active-text)' : 'var(--av-amber)',
+        cursor: 'pointer', userSelect: 'none', touchAction: 'none',
+        transition: 'background 0.06s, border-color 0.06s',
+      }}
+      title={`Save ${label}`}
+    >
+      SAVE
+    </button>
+  );
+};
+
+const PresetRecallButton: React.FC<{
+  join?: number;
+  label: string;
+  height: number;
+  fontSize: number;
+  onPress?: (j: number) => void;
+  onRelease?: (j: number) => void;
+}> = ({ join, label, height, fontSize, onPress, onRelease }) => {
+  const [pressed, setPressed] = useState(false);
+  return (
+    <button
+      onPointerDown={() => { setPressed(true); join && onPress?.(join); }}
+      onPointerUp={() => { setPressed(false); join && onRelease?.(join); }}
+      onPointerLeave={() => { setPressed(false); join && onRelease?.(join); }}
+      style={{
+        flex: 1, height, fontSize, fontWeight: 500, minWidth: 64,
+        background: pressed ? 'var(--av-active-bg)' : 'var(--av-bg-elevated)',
+        border: `1px solid ${pressed ? 'var(--av-active-border)' : 'var(--av-border-default)'}`,
+        borderRadius: 'var(--av-radius-sm)',
+        color: pressed ? 'var(--av-active-text)' : 'var(--av-text-primary)',
+        cursor: 'pointer', userSelect: 'none', padding: '0 8px', touchAction: 'none',
+        transition: 'background 0.06s, border-color 0.06s',
+      }}
+    >
+      {label}
+      {join && (
+        <span className="join-label" style={{ display: 'block', fontSize: 8, fontFamily: 'var(--av-font-mono)' }}>D{join}</span>
+      )}
+    </button>
+  );
+};
+
 export const PTZControl: React.FC<PTZControlProps> = ({
   panLeftJoin, panRightJoin, tiltUpJoin, tiltDownJoin,
   zoomInJoin, zoomOutJoin, homeJoin,
@@ -162,35 +227,24 @@ export const PTZControl: React.FC<PTZControlProps> = ({
           {presets.map((preset, i) => (
             <div key={i} style={{ display: 'flex', gap: 4 }}>
               {preset.saveJoin && (
-                <button
-                  onPointerDown={() => onPress?.(preset.saveJoin!)}
-                  onPointerUp={() => onRelease?.(preset.saveJoin!)}
-                  style={{
-                    width: s.presetSaveWidth, height: s.presetHeight, fontSize: s.smallFontSize, fontWeight: 600,
-                    background: 'var(--av-bg-elevated)', border: '1px solid var(--av-border-default)',
-                    borderRadius: 'var(--av-radius-sm)', color: 'var(--av-amber)',
-                    cursor: 'pointer', userSelect: 'none',
-                  }}
-                  title={`Save ${preset.label}`}
-                >
-                  SAVE
-                </button>
+                <PresetSaveButton
+                  join={preset.saveJoin}
+                  label={preset.label}
+                  width={s.presetSaveWidth}
+                  height={s.presetHeight}
+                  fontSize={s.smallFontSize}
+                  onPress={onPress}
+                  onRelease={onRelease}
+                />
               )}
-              <button
-                onPointerDown={() => preset.recallJoin && onPress?.(preset.recallJoin)}
-                onPointerUp={() => preset.recallJoin && onRelease?.(preset.recallJoin)}
-                style={{
-                  flex: 1, height: s.presetHeight, fontSize: s.labelFontSize, fontWeight: 500, minWidth: 64,
-                  background: 'var(--av-bg-elevated)', border: '1px solid var(--av-border-default)',
-                  borderRadius: 'var(--av-radius-sm)', color: 'var(--av-text-primary)',
-                  cursor: 'pointer', userSelect: 'none', padding: '0 8px',
-                }}
-              >
-                {preset.label}
-                {preset.recallJoin && (
-                  <span className="join-label" style={{ display: 'block', fontSize: 8, fontFamily: 'var(--av-font-mono)' }}>D{preset.recallJoin}</span>
-                )}
-              </button>
+              <PresetRecallButton
+                join={preset.recallJoin}
+                label={preset.label}
+                height={s.presetHeight}
+                fontSize={s.labelFontSize}
+                onPress={onPress}
+                onRelease={onRelease}
+              />
             </div>
           ))}
         </div>

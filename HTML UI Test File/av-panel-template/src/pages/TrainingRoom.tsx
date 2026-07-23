@@ -63,8 +63,13 @@ export const TrainingRoom: React.FC = () => {
   // a single feedback signal that drives BOTH the On and Off button
   // highlights for their box (On lit when true, Off lit when false) — see
   // the join list: press34/35 share fb34, press36/37 share fb36.
-  const [displayPowerOn, setDisplayPowerOn] = useState(false);
-  const [projectorPowerOn, setProjectorPowerOn] = useState(false);
+  //
+  // Starts at null (unknown), not false — false IS a real feedback value
+  // ("confirmed off"), so using it as the initial/no-signal-yet default
+  // made Off light up before the processor had said anything at all.
+  // Neither button lights while the state is still null.
+  const [displayPowerOn, setDisplayPowerOn] = useState<boolean | null>(null);
+  const [projectorPowerOn, setProjectorPowerOn] = useState<boolean | null>(null);
 
   useEffect(() => {
     const displayFbId = window.CrComLib.subscribeState('boolean', '34', setDisplayPowerOn);
@@ -108,6 +113,8 @@ export const TrainingRoom: React.FC = () => {
                 { label: 'Podium', recallJoin: 39, saveJoin: 40 },
                 { label: 'Wide',   recallJoin: 38, saveJoin: 41 },
               ]}
+              onPress={(join) => window.CrComLib.publishEvent('boolean', String(join), true)}
+              onRelease={(join) => window.CrComLib.publishEvent('boolean', String(join), false)}
             />
           </GroupBox>
         </Positioned>
@@ -133,7 +140,7 @@ export const TrainingRoom: React.FC = () => {
               color="danger"
               variant="momentary"
               size="lg"
-              active={!displayPowerOn}
+              active={displayPowerOn === false}
               onPress={() => window.CrComLib.publishEvent('boolean', '35', true)}
               onRelease={() => window.CrComLib.publishEvent('boolean', '35', false)}
             />
@@ -143,7 +150,7 @@ export const TrainingRoom: React.FC = () => {
               color="success"
               variant="momentary"
               size="lg"
-              active={displayPowerOn}
+              active={displayPowerOn === true}
               onPress={() => window.CrComLib.publishEvent('boolean', '34', true)}
               onRelease={() => window.CrComLib.publishEvent('boolean', '34', false)}
             />
@@ -165,7 +172,7 @@ export const TrainingRoom: React.FC = () => {
               color="danger"
               variant="momentary"
               size="lg"
-              active={!projectorPowerOn}
+              active={projectorPowerOn === false}
               onPress={() => window.CrComLib.publishEvent('boolean', '37', true)}
               onRelease={() => window.CrComLib.publishEvent('boolean', '37', false)}
             />
@@ -175,7 +182,7 @@ export const TrainingRoom: React.FC = () => {
               color="success"
               variant="momentary"
               size="lg"
-              active={projectorPowerOn}
+              active={projectorPowerOn === true}
               onPress={() => window.CrComLib.publishEvent('boolean', '36', true)}
               onRelease={() => window.CrComLib.publishEvent('boolean', '36', false)}
             />

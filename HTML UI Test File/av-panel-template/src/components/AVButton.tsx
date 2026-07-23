@@ -71,10 +71,16 @@ export const AVButton: React.FC<AVButtonProps> = ({
   className = '',
 }) => {
   const [internalActive, setInternalActive] = useState(false);
-  const isActive = controlledActive !== undefined ? controlledActive : internalActive;
+  // Local, instant press feedback — independent of controlledActive so a
+  // feedback-driven button (active passed from CH5 state) still flashes
+  // the moment it's touched, rather than waiting on a processor round-trip.
+  // Falls back to the real controlled/internal state as soon as you let go.
+  const [pressed, setPressed] = useState(false);
+  const isActive = pressed || (controlledActive !== undefined ? controlledActive : internalActive);
 
   const handlePointerDown = () => {
     if (disabled) return;
+    setPressed(true);
     if (variant === 'toggle') setInternalActive(v => !v);
     if (variant === 'momentary') setInternalActive(true);
     onPress?.();
@@ -82,6 +88,7 @@ export const AVButton: React.FC<AVButtonProps> = ({
 
   const handlePointerUp = () => {
     if (disabled) return;
+    setPressed(false);
     if (variant === 'momentary') {
       setInternalActive(false);
       onRelease?.();
