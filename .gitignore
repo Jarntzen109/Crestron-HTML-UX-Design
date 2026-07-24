@@ -218,6 +218,7 @@ ClientBin/
 *.publishsettings
 node_modules/
 dist/
+release/
 
 # RIA/Silverlight projects
 Generated_Code/

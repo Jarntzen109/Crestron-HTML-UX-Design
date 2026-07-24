@@ -250,9 +250,17 @@ built anything against those old dimensions, re-check the layout.
 ```bash
 npm run package
 ```
-This builds the app and packages it into `dist/av-panel-template.ch5z`
+This builds the app and packages it into `release/av-panel-template.ch5z`
 — a single file ready to load onto a touch panel. Each panel/room is
 its own build: package once per `ACTIVE_PAGE` you set in Step 7.
+
+The output goes to `release/`, not `dist/`, on purpose — `dist/` is
+also the *source* directory `ch5-cli archive` reads from (`-d dist`).
+Pointing its output (`-o`) at that same folder makes it re-scan its
+own still-growing archive as input on every pass, which doesn't error,
+it just balloons — we hit a multi-GB runaway file from exactly this
+before fixing it. Keep `-d` and `-o` pointed at different folders in
+`package.json`'s `package` script if you ever touch it.
 
 Load the `.ch5z` onto the panel with either:
 - **Toolbox** → Web Pages and Mobility Projects, drag in the `.ch5z`, or

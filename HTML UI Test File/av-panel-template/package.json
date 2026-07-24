@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "package": "npm run build && ch5-cli archive -p av-panel-template -d dist -o dist"
+    "package": "npm run build && ch5-cli archive -p av-panel-template -d dist -o release"
   },
   "dependencies": {
     "@crestron/ch5-crcomlib": "^2.18.0",

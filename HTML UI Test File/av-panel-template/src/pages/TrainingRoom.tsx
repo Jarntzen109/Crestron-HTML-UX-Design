@@ -140,14 +140,16 @@ export const TrainingRoom: React.FC = () => {
     };
   }, []);
 
-  // Room volume up/down/mute — PLACEHOLDER joins (60/61/62). You said
-  // you'll build this logic in SIMPL next; swap these three numbers for
-  // the real ones once you have them (search for 60, 61, 62 below).
+  // Room volume up/down/mute — confirmed against the touchpanel symbol:
+  // press42/43/44 = Room_Vol_Up/Down/Mute, fb44 = Room_Vol_Mute_fb.
+  // Up/Down have no feedback (plain momentary ramp, same as PTZ), Mute
+  // follows the same feedback-driven rule as every other toggle-like
+  // control here — same join (44) for both press and feedback.
   const [roomMuted, setRoomMuted] = useState(false);
 
   useEffect(() => {
-    const muteId = window.CrComLib.subscribeState('boolean', '62', setRoomMuted);
-    return () => window.CrComLib.unsubscribeState('boolean', '62', muteId);
+    const muteId = window.CrComLib.subscribeState('boolean', '44', setRoomMuted);
+    return () => window.CrComLib.unsubscribeState('boolean', '44', muteId);
   }, []);
 
   return (
@@ -167,7 +169,16 @@ export const TrainingRoom: React.FC = () => {
                 <AVButtonGroup
                   columns={3}
                   activeIndex={sourceIndex}
-                  onSelect={(i) => window.CrComLib.publishEvent('boolean', String(SOURCE_PRESS_JOINS[i]), true)}
+                  onSelect={(i) => {
+                    // A select tap is one gesture, not press-then-release like
+                    // the momentary power buttons — so send the pulse
+                    // programmatically instead of relying on a release event
+                    // that AVButtonGroup's "select" buttons never fire. The
+                    // Interlock just needs a brief high, not a sustained one.
+                    const join = String(SOURCE_PRESS_JOINS[i]);
+                    window.CrComLib.publishEvent('boolean', join, true);
+                    setTimeout(() => window.CrComLib.publishEvent('boolean', join, false), 100);
+                  }}
                 >
                   <AVButton label="Teams"       joinNumber={30} size="lg" />
                   <AVButton label="Table HDMI"  joinNumber={31} size="lg" />
@@ -242,7 +253,7 @@ export const TrainingRoom: React.FC = () => {
           <GroupBox title="Room Volume" style={{ height: '100%', justifyContent: 'center', alignItems: 'center' }}>
             <AVButton
               label="▲"
-              joinNumber={60}
+              joinNumber={42}
               variant="momentary"
               size="md"
               style={{ width: 64 }}
@@ -253,7 +264,7 @@ export const TrainingRoom: React.FC = () => {
             <div style={{ display: 'flex', gap: 8 }}>
               <AVButton
                 label="▼"
-                joinNumber={61}
+                joinNumber={43}
                 variant="momentary"
                 size="md"
                 style={{ width: 64 }}
@@ -262,7 +273,7 @@ export const TrainingRoom: React.FC = () => {
               />
               <AVButton
                 label="Mute"
-                joinNumber={62}
+                joinNumber={44}
                 variant="momentary"
                 size="md"
                 color="danger"

@@ -167,10 +167,19 @@ export const AVButton: React.FC<AVButtonProps> = ({
 //
 //  CONTROLLED BY CH5 FEEDBACK — pass activeIndex so the highlighted
 //  button reflects your program's actual select join, not just the
-//  last thing pressed on screen. Use onSelect to publish the join:
+//  last thing pressed on screen. Use onSelect to publish the join —
+//  as a brief pulse, not a bare `true`. A select tap is one gesture,
+//  not press-then-release like a momentary button, so onSelect never
+//  fires a matching "release" to bring the join back down; send the
+//  false yourself or the join just latches high on the join and
+//  never clears (ask why your Interlock/router input stays lit):
 //    <AVButtonGroup
 //      activeIndex={sourceFeedbackIndex}
-//      onSelect={(i) => CrComLib.publishEvent('boolean', String(10 + i), true)}
+//      onSelect={(i) => {
+//        const join = String(10 + i);
+//        CrComLib.publishEvent('boolean', join, true);
+//        setTimeout(() => CrComLib.publishEvent('boolean', join, false), 100);
+//      }}
 //    >
 //      <AVButton label="HDMI 1" joinNumber={10} variant="select" />
 //      <AVButton label="HDMI 2" joinNumber={11} variant="select" />
